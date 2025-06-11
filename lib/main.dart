@@ -33,11 +33,11 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    DialogFlowtter.fromFile(
-      path: "assets/dialogflow_auth.json",
-    ).then((instance) => dialogFlowtter = instance).catchError((e) {
-      print("❌ Dialogflow init failed: $e");
-    });
+    // DialogFlowtter.fromFile(
+    //   path: "assets/dialogflow_auth.json",
+    // ).then((instance) => dialogFlowtter = instance).catchError((e) {
+    //   print("❌ Dialogflow init failed: $e");
+    // });
   }
 
   @override
