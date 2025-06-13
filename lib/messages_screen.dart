@@ -1,57 +1,80 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'controller/chat_controller.dart';
 
-class MessagesScreen extends StatefulWidget {
-  final List messages;
-  const MessagesScreen({Key? key, required this.messages}) : super(key: key);
+class MessagesScreen extends StatelessWidget {
+  const MessagesScreen({super.key});
 
-  @override
-  _MessagesScreenState createState() => _MessagesScreenState();
-}
-
-class _MessagesScreenState extends State<MessagesScreen> {
   @override
   Widget build(BuildContext context) {
-    var w = MediaQuery.of(context).size.width;
-    return ListView.separated(
-      itemBuilder: (context, index) {
-        return Container(
-          margin: EdgeInsets.all(10),
-          child: Row(
-            mainAxisAlignment:
-                widget.messages[index]['isUserMessage']
-                    ? MainAxisAlignment.end
-                    : MainAxisAlignment.start,
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 14, horizontal: 14),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                    bottomRight: Radius.circular(
-                      widget.messages[index]['isUserMessage'] ? 0 : 20,
+    final ChatController controller = Get.find();
+    final width = MediaQuery.of(context).size.width;
+
+    return Obx(
+      () => ListView.separated(
+        reverse: true,
+        itemBuilder: (context, index) {
+          final message = controller.messages.reversed.toList()[index];
+          final isUser = message['isUserMessage'];
+
+          return Container(
+            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment:
+                  isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+              children: [
+                //  Chatbot Avatar
+                if (!isUser)
+                  const CircleAvatar(
+                    backgroundColor: Colors.deepPurple,
+                    child: Icon(Icons.smart_toy, color: Colors.white),
+                  ),
+
+                if (!isUser) const SizedBox(width: 8),
+
+                //  Chat Bubble
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 16,
                     ),
-                    topLeft: Radius.circular(
-                      widget.messages[index]['isUserMessage'] ? 20 : 0,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: const Radius.circular(20),
+                        topRight: const Radius.circular(20),
+                        bottomRight: Radius.circular(isUser ? 0 : 20),
+                        topLeft: Radius.circular(isUser ? 20 : 0),
+                      ),
+                      color:
+                          isUser
+                              ? Colors.grey.shade800
+                              : Colors.deepPurple.shade700.withOpacity(0.9),
+                    ),
+                    constraints: BoxConstraints(maxWidth: width * 0.7),
+                    child: Text(
+                      message['message'].text.text[0],
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
-                  color:
-                      widget.messages[index]['isUserMessage']
-                          ? Colors.grey.shade800
-                          : Colors.grey.shade900.withOpacity(0.8),
                 ),
-                constraints: BoxConstraints(maxWidth: w * 2 / 3),
-                child: Text(
-                  widget.messages[index]['message'].text.text[0],
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-      separatorBuilder: (_, i) => Padding(padding: EdgeInsets.only(top: 10)),
-      itemCount: widget.messages.length,
+
+                if (isUser) const SizedBox(width: 8),
+
+                // Optional: User Avatar (if needed)
+                // if (isUser)
+                //   const CircleAvatar(
+                //     backgroundColor: Colors.grey,
+                //     child: Icon(Icons.person, color: Colors.white),
+                //   ),
+              ],
+            ),
+          );
+        },
+        separatorBuilder: (_, i) => const SizedBox(height: 4),
+        itemCount: controller.messages.length,
+      ),
     );
   }
 }
